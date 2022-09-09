@@ -1,7 +1,7 @@
 import jax
 import jax.numpy as jnp
 from equinox import nn, Module
-from ops import RNG, LReLU, Upscale
+from .ops import RNG, LReLU, Upscale
 
 class ResidualDenseBlock(Module):
     layers:list

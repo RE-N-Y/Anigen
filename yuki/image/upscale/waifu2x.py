@@ -1,7 +1,7 @@
 import jax
 import jax.numpy as jnp
 from equinox import nn, Module
-from ops import RNG, LReLU, Deconvolution
+from .ops import RNG, LReLU, Deconvolution
 
 class Waifu2x(Module):
     net: Module
