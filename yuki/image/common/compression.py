@@ -17,16 +17,15 @@ def euclidean_distance(samples, codes):
     return distance
 
 class VectorQuantiser(nn.Module):
-    features:int
-    pages:int
-    beta:float
+    features:int = 768
+    code_features:int = 16
+    codes:int = 8192
+    beta:float = 0.25
 
-    def setup(self, features:int, code_features:int, pages:int, beta:float=0.25):
-        self.codebook = nn.Embed(pages, code_features)
-        self.input =  nn.Dense(code_features)
-        self.output = nn.Dense(features)
-        self.pages = pages
-        self.beta = beta
+    def setup(self):
+        self.codebook = nn.Embed(self.codes, self.code_features)
+        self.input =  nn.Dense(self.code_features)
+        self.output = nn.Dense(self.features)
 
     def __call__(self, z):
         z = self.input(z)
@@ -34,7 +33,7 @@ class VectorQuantiser(nn.Module):
 
         distance = euclidean_distance(z, codes)
         idxes = jnp.argmin(distance, axis=-1)
-        codes = normalise(self.codebook(idxes), axis = -1)
+        codes = normalise(self.codebook(idxes))
 
         loss = self.beta * jnp.mean((sg(z) - codes) ** 2) + \
                            jnp.mean((z - sg(codes)) ** 2)
