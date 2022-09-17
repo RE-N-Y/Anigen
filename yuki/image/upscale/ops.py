@@ -4,6 +4,7 @@ import jax.random as jr
 import jax.nn.initializers as jinit
 from equinox import nn, static_field, Module
 from einops import rearrange, reduce
+from yuki.common.ops import convolve
 
 def RNG(old):
     while True:
@@ -58,13 +59,7 @@ class Deconvolution(Module):
     def __call__(self, x, key = None):
         x = rearrange(x, 'c h w -> 1 c h w')
 
-        x = jax.lax.conv_transpose(
-            x, self.weight, self.stride, 
-            self.padding, self.dilation, 
-            transpose_kernel=True, 
-            dimension_numbers=("NCHW", "OIHW", "NCHW")
-        )
-
+        x = convolve(x, self.weight, self.stride, self.padding, self.dilation, transpose = True)
         x = rearrange(x, 'n c h w -> (n c) h w')
 
         if self.use_bias:
